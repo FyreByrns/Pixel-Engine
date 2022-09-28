@@ -13,6 +13,8 @@ namespace PixelEngine
 {
 	public abstract class Game : Display
 	{
+		public static bool DUMB_PARALLEL_DRAW { get; protected set; } = false;
+
 		#region Members
 		public int MouseX { get; private set; }
 		public int MouseY { get; private set; }
@@ -1029,10 +1031,18 @@ namespace PixelEngine
 		{
 			if (spr == null)
 				return;
-
-			for (int i = 0; i < spr.Width; i++)
-				for (int j = 0; j < spr.Height; j++)
-					Draw(p.X + i, p.Y + j, spr[i, j]);
+			if (DUMB_PARALLEL_DRAW) {
+				System.Threading.Tasks.Parallel.For(0, spr.Width, (int i) => {
+					System.Threading.Tasks.Parallel.For(0, spr.Height, (int j) => {
+						Draw(p.X + i, p.Y + j, spr[i, j]);
+					});
+				});
+			}
+			else {
+				for (int i = 0; i < spr.Width; i++)
+					for (int j = 0; j < spr.Height; j++)
+						Draw(p.X + i, p.Y + j, spr[i, j]);
+			}
 		}
 		public void DrawPartialSprite(Point p, Sprite spr, Point op, int w, int h)
 		{
@@ -1046,19 +1056,26 @@ namespace PixelEngine
 		public void Clear(Pixel p)
 		{
 			Pixel[] pixels = drawTarget.GetData();
-			for (int i = 0; i < pixels.Length; i++)
-				pixels[i] = p;
+			if (DUMB_PARALLEL_DRAW) {
+				System.Threading.Tasks.Parallel.For(0, pixels.Length, (int i) => {
+					pixels[i] = p;
+				});
+			}
+			else {
+				for (int i = 0; i < pixels.Length; i++)
+					pixels[i] = p;
+			}
 
-			if (hrText)
+				if (hrText)
 			{
 				pixels = textTarget.GetData();
 				for (int i = 0; i < pixels.Length; i++)
 					pixels[i] = Pixel.Empty;
 			}
 		}
-		#endregion
+#endregion
 
-		#region Subsystems
+#region Subsystems
 		public enum Subsystem
 		{
 			Fullscreen,
@@ -1117,7 +1134,7 @@ namespace PixelEngine
 			}
 		}
 
-		#region Text
+#region Text
 		public void DrawText(Point p, string text, Pixel col, int scale = 1)
 		{
 			if (string.IsNullOrWhiteSpace(text))
@@ -1277,9 +1294,9 @@ namespace PixelEngine
 				}
 			}
 		}
-		#endregion
+#endregion
 
-		#region Audio
+#region Audio
 		public virtual float OnSoundCreate(int channels, float globalTime, float timeStep) => 0;
 		public virtual float OnSoundFilter(int channels, float globalTime, float sample) => sample;
 
@@ -1299,10 +1316,10 @@ namespace PixelEngine
 			if (audio != null)
 				audio.StopSound(s);
 		}
-		#endregion
-		#endregion
+#endregion
+#endregion
 
-		#region Functionality
+#region Functionality
 		public virtual void OnCreate() { }
 		public virtual void OnUpdate(float elapsed) { }
 		public virtual void OnMousePress(Mouse m) { }
@@ -1313,6 +1330,6 @@ namespace PixelEngine
 		public virtual void OnKeyRelease(Key k) { }
 		public virtual void OnKeyDown(Key k) { }
 		public virtual void OnDestroy() { }
-		#endregion
+#endregion
 	}
 }
