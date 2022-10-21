@@ -6,7 +6,7 @@ using System.Security;
 
 namespace PixelEngine
 {
-	internal static unsafe class Windows
+	public static unsafe class Windows
 	{
 		public static readonly string TempPath;
 

@@ -308,6 +308,7 @@ namespace PixelEngine
 					Focus = false;
 					break;
 				case (uint)WM.KEYDOWN:
+					RawKeyPress((VK)wParam);
 					if (!mapKeys.ContainsKey((uint)wParam))
 						break;
 					Key kd = mapKeys[(uint)wParam];
@@ -315,6 +316,7 @@ namespace PixelEngine
 					OnKeyPress(kd);
 					break;
 				case (uint)WM.KEYUP:
+					RawKeyRelease((VK)wParam);
 					if (!mapKeys.ContainsKey((uint)wParam))
 						break;
 					Key ku = mapKeys[(uint)wParam];
@@ -551,28 +553,38 @@ namespace PixelEngine
 		}
 		private void MapKeyboard()
 		{
-			mapKeys[0x41] = Key.A; mapKeys[0x42] = Key.B; mapKeys[0x43] = Key.C; mapKeys[0x44] = Key.D; mapKeys[0x45] = Key.E;
-			mapKeys[0x46] = Key.F; mapKeys[0x47] = Key.G; mapKeys[0x48] = Key.H; mapKeys[0x49] = Key.I; mapKeys[0x4A] = Key.J;
-			mapKeys[0x4B] = Key.K; mapKeys[0x4C] = Key.L; mapKeys[0x4D] = Key.M; mapKeys[0x4E] = Key.N; mapKeys[0x4F] = Key.O;
-			mapKeys[0x50] = Key.P; mapKeys[0x51] = Key.Q; mapKeys[0x52] = Key.R; mapKeys[0x53] = Key.S; mapKeys[0x54] = Key.T;
-			mapKeys[0x55] = Key.U; mapKeys[0x56] = Key.V; mapKeys[0x57] = Key.W; mapKeys[0x58] = Key.X; mapKeys[0x59] = Key.Y;
-			mapKeys[0x5A] = Key.Z;
+			Map(0x41, Key.A); Map(0x42, Key.B); Map(0x43, Key.C); Map(0x44, Key.D); Map(0x45, Key.E);
+			Map(0x46, Key.F); Map(0x47, Key.G); Map(0x48, Key.H); Map(0x49, Key.I); Map(0x4A, Key.J);
+			Map(0x4B, Key.K); Map(0x4C, Key.L); Map(0x4D, Key.M); Map(0x4E, Key.N); Map(0x4F, Key.O);
+			Map(0x50, Key.P); Map(0x51, Key.Q); Map(0x52, Key.R); Map(0x53, Key.S); Map(0x54, Key.T);
+			Map(0x55, Key.U); Map(0x56, Key.V); Map(0x57, Key.W); Map(0x58, Key.X); Map(0x59, Key.Y);
+			Map(0x5A, Key.Z);
 
-			mapKeys[(uint)VK.F1] = Key.F1; mapKeys[(uint)VK.F2] = Key.F2; mapKeys[(uint)VK.F3] = Key.F3; mapKeys[(uint)VK.F4] = Key.F4;
-			mapKeys[(uint)VK.F5] = Key.F5; mapKeys[(uint)VK.F6] = Key.F6; mapKeys[(uint)VK.F7] = Key.F7; mapKeys[(uint)VK.F8] = Key.F8;
-			mapKeys[(uint)VK.F9] = Key.F9; mapKeys[(uint)VK.F10] = Key.F10; mapKeys[(uint)VK.F11] = Key.F11; mapKeys[(uint)VK.F12] = Key.F12;
+			Map(VK.F1, Key.F1); Map(VK.F2, Key.F2); Map(VK.F3, Key.F3); Map(VK.F4, Key.F4);
+			Map(VK.F5, Key.F5); Map(VK.F6, Key.F6); Map(VK.F7, Key.F7); Map(VK.F8, Key.F8);
+			Map(VK.F9, Key.F9); Map(VK.F10, Key.F10); Map(VK.F11, Key.F11); Map(VK.F12, Key.F12);
 
-			mapKeys[(uint)VK.DOWN] = Key.Down; mapKeys[(uint)VK.LEFT] = Key.Left; mapKeys[(uint)VK.RIGHT] = Key.Right; mapKeys[(uint)VK.UP] = Key.Up;
+			Map(VK.DOWN, Key.Down); Map(VK.LEFT, Key.Left); Map(VK.RIGHT,  Key.Right); Map(VK.UP, Key.Up);
 
-			mapKeys[(uint)VK.BACK] = Key.Back; mapKeys[(uint)VK.ESCAPE] = Key.Escape; mapKeys[(uint)VK.RETURN] = Key.Enter; mapKeys[(uint)VK.PAUSE] = Key.Pause;
-			mapKeys[(uint)VK.SCROLL] = Key.Scroll; mapKeys[(uint)VK.TAB] = Key.Tab; mapKeys[(uint)VK.DELETE] = Key.Delete; mapKeys[(uint)VK.HOME] = Key.Home;
-			mapKeys[(uint)VK.END] = Key.End; mapKeys[(uint)VK.PRIOR] = Key.PageUp; mapKeys[(uint)VK.NEXT] = Key.PageDown; mapKeys[(uint)VK.INSERT] = Key.Insert;
-			mapKeys[(uint)VK.SHIFT] = Key.Shift; mapKeys[(uint)VK.CONTROL] = Key.Control;
-			mapKeys[(uint)VK.SPACE] = Key.Space;
+			Map(VK.BACK, Key.Back);		Map(VK.ESCAPE, Key.Escape);	Map(VK.RETURN, Key.Enter);	Map(VK.PAUSE, Key.Pause);
+			Map(VK.SCROLL, Key.Scroll); Map(VK.TAB, Key.Tab);		Map(VK.DELETE, Key.Delete);	Map(VK.HOME, Key.Home);
+			Map(VK.END, Key.End);		Map(VK.PRIOR, Key.PageUp);	Map(VK.NEXT, Key.PageDown); Map(VK.INSERT, Key.Insert);
+			Map(VK.SHIFT, Key.Shift);	Map(VK.CONTROL, Key.Control);
+			Map(VK.SPACE, Key.Space);
 
-			mapKeys[0x30] = Key.K0; mapKeys[0x31] = Key.K1; mapKeys[0x32] = Key.K2; mapKeys[0x33] = Key.K3; mapKeys[0x34] = Key.K4;
-			mapKeys[0x35] = Key.K5; mapKeys[0x36] = Key.K6; mapKeys[0x37] = Key.K7; mapKeys[0x38] = Key.K8; mapKeys[0x39] = Key.K9;
+			Map(0x30, Key.K0); Map(0x31, Key.K1); Map(0x32, Key.K2); Map(0x33, Key.K3); Map(0x34, Key.K4);
+			Map(0x35, Key.K5); Map(0x36, Key.K6); Map(0x37, Key.K7); Map(0x38, Key.K8); Map(0x39, Key.K9);
 		}
+
+		/// <summary>
+		/// Map a virtual key to a key enum key.
+		/// </summary>
+		public void Map(VK vk, Key key) {
+			mapKeys[(uint)vk] = key;
+        }
+		public void Map(uint vk, Key key) {
+			Map((VK)vk, key);
+        }
 		#endregion
 
 		#region Drawing
@@ -1326,7 +1338,9 @@ namespace PixelEngine
 		public virtual void OnMouseRelease(Mouse m) { }
 		public virtual void OnMouseDown(Mouse m) { }
 		public virtual void OnMouseScroll() { }
+		public virtual void RawKeyPress(VK vk) { }
 		public virtual void OnKeyPress(Key k) { }
+		public virtual void RawKeyRelease(VK vk) { }
 		public virtual void OnKeyRelease(Key k) { }
 		public virtual void OnKeyDown(Key k) { }
 		public virtual void OnDestroy() { }
