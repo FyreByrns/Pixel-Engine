@@ -343,6 +343,55 @@ namespace PixelEngine {
             MapKey((VK)vk, key);
         }
 
+        /// <summary>
+        /// <para>
+        /// Get the character corresponding to the pressed key on the standard US keyboard layout.
+        /// </para>
+        /// <para>
+        /// Respects shift.
+        /// </para>
+        /// </summary>
+        /// <returns>Resulting character, or default(char) if no character matches.</returns>
+        public char GetChar(Key key) {
+            if (KeysWithCorrespondingCharacters.Contains((int)key)) {
+                // find offset from Key value to CharKeyMapping index
+                int offset = 0;
+                foreach ((Key regionStart, int off) in KeyCharOffsets.Reverse()) {
+                    if (key >= regionStart) {
+                        offset += off;
+                        break;
+                    }
+                }
+
+                // offset is per key, character mapping is two characters wide per key
+                int baseIndex = (int)key * 2;
+
+                // if shift is down, offset + 1 for shifted character
+                if (GetKey(Key.Shift).Down) {
+                    offset++;
+                }
+
+                return KeyCharMapping[baseIndex + offset];
+            }
+            return default;
+        }
+        public static int[] KeysWithCorrespondingCharacters = new int[] {
+            // a - z
+            0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,
+            // k0 - k9
+            26,27,28,29,30,31,32,33,34,35,
+            // oem
+            67,68,69,70,71,72,73,/**/75,76,77,78,
+        };
+        public static (Key start, int offset)[] KeyCharOffsets = new (Key start, int offset)[] {
+            (Key.A, 0),
+            (Key.OEM_1, -67+5), // not sure why five is needed here, but without this mapping is incorrect
+        };
+        public static string KeyCharMapping = "" +
+            "aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwWxXyYzZ" +
+            "0)1!2@3#4$5%6^7&8*9(" +
+            ";:/?`~[{\\|]}'\"=+-_,<.>";
+
         public Input GetKey(Key k) {
             if (k == Key.Any)
                 return anyKey;
@@ -534,7 +583,7 @@ namespace PixelEngine {
             MapKey(0x30, Key.K0); MapKey(0x31, Key.K1); MapKey(0x32, Key.K2); MapKey(0x33, Key.K3); MapKey(0x34, Key.K4);
             MapKey(0x35, Key.K5); MapKey(0x36, Key.K6); MapKey(0x37, Key.K7); MapKey(0x38, Key.K8); MapKey(0x39, Key.K9);
 
-            MapKey(VK.OEM_1, Key.OEM_1); MapKey(VK.OEM_2, Key.OEM_2); MapKey(VK.OEM_3, Key.OEM_3); MapKey(VK.OEM_4, Key.OEM_4); 
+            MapKey(VK.OEM_1, Key.OEM_1); MapKey(VK.OEM_2, Key.OEM_2); MapKey(VK.OEM_3, Key.OEM_3); MapKey(VK.OEM_4, Key.OEM_4);
             MapKey(VK.OEM_5, Key.OEM_5); MapKey(VK.OEM_6, Key.OEM_6); MapKey(VK.OEM_7, Key.OEM_7); MapKey(VK.OEM_8, Key.OEM_8);
             MapKey(VK.OEM_PLUS, Key.OEM_PLUS); MapKey(VK.OEM_MINUS, Key.OEM_MINUS);
             MapKey(VK.OEM_COMMA, Key.OEM_COMMA); MapKey(VK.OEM_PERIOD, Key.OEM_PERIOD);
