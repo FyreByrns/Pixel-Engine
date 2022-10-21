@@ -355,23 +355,25 @@ namespace PixelEngine {
         public char GetChar(Key key) {
             if (KeysWithCorrespondingCharacters.Contains((int)key)) {
                 // find offset from Key value to CharKeyMapping index
-                int offset = 0;
-                foreach ((Key regionStart, int off) in KeyCharOffsets.Reverse()) {
-                    if (key >= regionStart) {
-                        offset += off;
-                        break;
+                int index = 0;
+                foreach((Key start, Key end, int off) in KeyCharOffsets) {
+                    if(start <= key && end >= key) {
+                        // within the range, apply the offset
+                        index = (int)key - (int)start + off;
                     }
                 }
 
                 // offset is per key, character mapping is two characters wide per key
-                int baseIndex = (int)key * 2;
+                index *= 2;
 
                 // if shift is down, offset + 1 for shifted character
                 if (GetKey(Key.Shift).Down) {
-                    offset++;
+                    index++;
                 }
 
-                return KeyCharMapping[baseIndex + offset];
+                Console.WriteLine($".{KeyCharMapping[index]}.");
+
+                return KeyCharMapping[index];
             }
             return default;
         }
@@ -380,16 +382,20 @@ namespace PixelEngine {
             0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,
             // k0 - k9
             26,27,28,29,30,31,32,33,34,35,
+            // space
+            52,
             // oem
             67,68,69,70,71,72,73,/**/75,76,77,78,
         };
-        public static (Key start, int offset)[] KeyCharOffsets = new (Key start, int offset)[] {
-            (Key.A, 0),
-            (Key.OEM_1, -67+5), // not sure why five is needed here, but without this mapping is incorrect
+        public static (Key start, Key end, int offset)[] KeyCharOffsets = new (Key, Key, int)[] {
+            (Key.A, Key.K9, 0),
+            (Key.Space, Key.Space, 36),
+            (Key.OEM_1, Key.OEM_PERIOD, 37)
         };
         public static string KeyCharMapping = "" +
             "aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwWxXyYzZ" +
             "0)1!2@3#4$5%6^7&8*9(" +
+            "  " +
             ";:/?`~[{\\|]}'\"=+-_,<.>";
 
         public Input GetKey(Key k) {
