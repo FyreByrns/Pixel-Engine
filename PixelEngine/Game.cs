@@ -333,6 +333,16 @@ namespace PixelEngine {
 
         #region Helpers
         #region Engine
+        /// <summary>
+        /// Map a virtual key to a key enum key.
+        /// </summary>
+        public void MapKey(VK vk, Key key) {
+            mapKeys[(uint)vk] = key;
+        }
+        public void MapKey(uint vk, Key key) {
+            MapKey((VK)vk, key);
+        }
+
         public Input GetKey(Key k) {
             if (k == Key.Any)
                 return anyKey;
@@ -502,42 +512,32 @@ namespace PixelEngine {
             RegisterClassEx(ref wc);
         }
         private void MapKeyboard() {
-            Map(0x41, Key.A); Map(0x42, Key.B); Map(0x43, Key.C); Map(0x44, Key.D); Map(0x45, Key.E);
-            Map(0x46, Key.F); Map(0x47, Key.G); Map(0x48, Key.H); Map(0x49, Key.I); Map(0x4A, Key.J);
-            Map(0x4B, Key.K); Map(0x4C, Key.L); Map(0x4D, Key.M); Map(0x4E, Key.N); Map(0x4F, Key.O);
-            Map(0x50, Key.P); Map(0x51, Key.Q); Map(0x52, Key.R); Map(0x53, Key.S); Map(0x54, Key.T);
-            Map(0x55, Key.U); Map(0x56, Key.V); Map(0x57, Key.W); Map(0x58, Key.X); Map(0x59, Key.Y);
-            Map(0x5A, Key.Z);
+            MapKey(0x41, Key.A); MapKey(0x42, Key.B); MapKey(0x43, Key.C); MapKey(0x44, Key.D); MapKey(0x45, Key.E);
+            MapKey(0x46, Key.F); MapKey(0x47, Key.G); MapKey(0x48, Key.H); MapKey(0x49, Key.I); MapKey(0x4A, Key.J);
+            MapKey(0x4B, Key.K); MapKey(0x4C, Key.L); MapKey(0x4D, Key.M); MapKey(0x4E, Key.N); MapKey(0x4F, Key.O);
+            MapKey(0x50, Key.P); MapKey(0x51, Key.Q); MapKey(0x52, Key.R); MapKey(0x53, Key.S); MapKey(0x54, Key.T);
+            MapKey(0x55, Key.U); MapKey(0x56, Key.V); MapKey(0x57, Key.W); MapKey(0x58, Key.X); MapKey(0x59, Key.Y);
+            MapKey(0x5A, Key.Z);
 
-            Map(VK.F1, Key.F1); Map(VK.F2, Key.F2); Map(VK.F3, Key.F3); Map(VK.F4, Key.F4);
-            Map(VK.F5, Key.F5); Map(VK.F6, Key.F6); Map(VK.F7, Key.F7); Map(VK.F8, Key.F8);
-            Map(VK.F9, Key.F9); Map(VK.F10, Key.F10); Map(VK.F11, Key.F11); Map(VK.F12, Key.F12);
+            MapKey(VK.F1, Key.F1); MapKey(VK.F2, Key.F2); MapKey(VK.F3, Key.F3); MapKey(VK.F4, Key.F4);
+            MapKey(VK.F5, Key.F5); MapKey(VK.F6, Key.F6); MapKey(VK.F7, Key.F7); MapKey(VK.F8, Key.F8);
+            MapKey(VK.F9, Key.F9); MapKey(VK.F10, Key.F10); MapKey(VK.F11, Key.F11); MapKey(VK.F12, Key.F12);
 
-            Map(VK.DOWN, Key.Down); Map(VK.LEFT, Key.Left); Map(VK.RIGHT, Key.Right); Map(VK.UP, Key.Up);
+            MapKey(VK.DOWN, Key.Down); MapKey(VK.LEFT, Key.Left); MapKey(VK.RIGHT, Key.Right); MapKey(VK.UP, Key.Up);
 
-            Map(VK.BACK, Key.Back); Map(VK.ESCAPE, Key.Escape); Map(VK.RETURN, Key.Enter); Map(VK.PAUSE, Key.Pause);
-            Map(VK.SCROLL, Key.Scroll); Map(VK.TAB, Key.Tab); Map(VK.DELETE, Key.Delete); Map(VK.HOME, Key.Home);
-            Map(VK.END, Key.End); Map(VK.PRIOR, Key.PageUp); Map(VK.NEXT, Key.PageDown); Map(VK.INSERT, Key.Insert);
-            Map(VK.SHIFT, Key.Shift); Map(VK.CONTROL, Key.Control);
-            Map(VK.SPACE, Key.Space);
+            MapKey(VK.BACK, Key.Back); MapKey(VK.ESCAPE, Key.Escape); MapKey(VK.RETURN, Key.Enter); MapKey(VK.PAUSE, Key.Pause);
+            MapKey(VK.SCROLL, Key.Scroll); MapKey(VK.TAB, Key.Tab); MapKey(VK.DELETE, Key.Delete); MapKey(VK.HOME, Key.Home);
+            MapKey(VK.END, Key.End); MapKey(VK.PRIOR, Key.PageUp); MapKey(VK.NEXT, Key.PageDown); MapKey(VK.INSERT, Key.Insert);
+            MapKey(VK.SHIFT, Key.Shift); MapKey(VK.CONTROL, Key.Control);
+            MapKey(VK.SPACE, Key.Space);
 
-            Map(0x30, Key.K0); Map(0x31, Key.K1); Map(0x32, Key.K2); Map(0x33, Key.K3); Map(0x34, Key.K4);
-            Map(0x35, Key.K5); Map(0x36, Key.K6); Map(0x37, Key.K7); Map(0x38, Key.K8); Map(0x39, Key.K9);
+            MapKey(0x30, Key.K0); MapKey(0x31, Key.K1); MapKey(0x32, Key.K2); MapKey(0x33, Key.K3); MapKey(0x34, Key.K4);
+            MapKey(0x35, Key.K5); MapKey(0x36, Key.K6); MapKey(0x37, Key.K7); MapKey(0x38, Key.K8); MapKey(0x39, Key.K9);
 
-            Map(VK.OEM_1, Key.OEM_1); Map(VK.OEM_2, Key.OEM_2); Map(VK.OEM_3, Key.OEM_3); Map(VK.OEM_4, Key.OEM_4); 
-            Map(VK.OEM_5, Key.OEM_5); Map(VK.OEM_6, Key.OEM_6); Map(VK.OEM_7, Key.OEM_7); Map(VK.OEM_8, Key.OEM_8);
-            Map(VK.OEM_PLUS, Key.OEM_PLUS); Map(VK.OEM_MINUS, Key.OEM_MINUS);
-            Map(VK.OEM_COMMA, Key.OEM_COMMA); Map(VK.OEM_PERIOD, Key.OEM_PERIOD);
-        }
-
-        /// <summary>
-        /// Map a virtual key to a key enum key.
-        /// </summary>
-        public void Map(VK vk, Key key) {
-            mapKeys[(uint)vk] = key;
-        }
-        public void Map(uint vk, Key key) {
-            Map((VK)vk, key);
+            MapKey(VK.OEM_1, Key.OEM_1); MapKey(VK.OEM_2, Key.OEM_2); MapKey(VK.OEM_3, Key.OEM_3); MapKey(VK.OEM_4, Key.OEM_4); 
+            MapKey(VK.OEM_5, Key.OEM_5); MapKey(VK.OEM_6, Key.OEM_6); MapKey(VK.OEM_7, Key.OEM_7); MapKey(VK.OEM_8, Key.OEM_8);
+            MapKey(VK.OEM_PLUS, Key.OEM_PLUS); MapKey(VK.OEM_MINUS, Key.OEM_MINUS);
+            MapKey(VK.OEM_COMMA, Key.OEM_COMMA); MapKey(VK.OEM_PERIOD, Key.OEM_PERIOD);
         }
         #endregion
 
