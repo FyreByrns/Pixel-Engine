@@ -6,7 +6,7 @@
 		K0, K1, K2, K3, K4, K5, K6, K7, K8, K9,
 		F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, F12,
 		Up, Down, Left, Right,
-		Space, Tab, Shift, Control, Insert, Delete, Home, End, PageUp, PageDown,
+		Space, Tab, Shift, Control, Alt, Insert, Delete, Home, End, PageUp, PageDown,
 		Back, Escape, Enter, Pause, Scroll, 
 		
 		// OEM keys, may vary			// US standard mappings [unshiftSHIFT]

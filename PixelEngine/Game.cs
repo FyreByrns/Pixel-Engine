@@ -583,7 +583,7 @@ namespace PixelEngine {
             MapKey(VK.BACK, Key.Back); MapKey(VK.ESCAPE, Key.Escape); MapKey(VK.RETURN, Key.Enter); MapKey(VK.PAUSE, Key.Pause);
             MapKey(VK.SCROLL, Key.Scroll); MapKey(VK.TAB, Key.Tab); MapKey(VK.DELETE, Key.Delete); MapKey(VK.HOME, Key.Home);
             MapKey(VK.END, Key.End); MapKey(VK.PRIOR, Key.PageUp); MapKey(VK.NEXT, Key.PageDown); MapKey(VK.INSERT, Key.Insert);
-            MapKey(VK.SHIFT, Key.Shift); MapKey(VK.CONTROL, Key.Control);
+            MapKey(VK.SHIFT, Key.Shift); MapKey(VK.CONTROL, Key.Control); MapKey(VK.MENU, Key.Alt);
             MapKey(VK.SPACE, Key.Space);
 
             MapKey(0x30, Key.K0); MapKey(0x31, Key.K1); MapKey(0x32, Key.K2); MapKey(0x33, Key.K3); MapKey(0x34, Key.K4);
