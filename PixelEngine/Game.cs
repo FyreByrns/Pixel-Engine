@@ -523,6 +523,11 @@ namespace PixelEngine {
 
             Map(0x30, Key.K0); Map(0x31, Key.K1); Map(0x32, Key.K2); Map(0x33, Key.K3); Map(0x34, Key.K4);
             Map(0x35, Key.K5); Map(0x36, Key.K6); Map(0x37, Key.K7); Map(0x38, Key.K8); Map(0x39, Key.K9);
+
+            Map(VK.OEM_1, Key.OEM_1); Map(VK.OEM_2, Key.OEM_2); Map(VK.OEM_3, Key.OEM_3); Map(VK.OEM_4, Key.OEM_4); 
+            Map(VK.OEM_5, Key.OEM_5); Map(VK.OEM_6, Key.OEM_6); Map(VK.OEM_7, Key.OEM_7); Map(VK.OEM_8, Key.OEM_8);
+            Map(VK.OEM_PLUS, Key.OEM_PLUS); Map(VK.OEM_MINUS, Key.OEM_MINUS);
+            Map(VK.OEM_COMMA, Key.OEM_COMMA); Map(VK.OEM_PERIOD, Key.OEM_PERIOD);
         }
 
         /// <summary>
