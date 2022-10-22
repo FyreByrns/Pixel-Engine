@@ -371,8 +371,6 @@ namespace PixelEngine {
                     index++;
                 }
 
-                Console.WriteLine($".{KeyCharMapping[index]}.");
-
                 return KeyCharMapping[index];
             }
             return default;
