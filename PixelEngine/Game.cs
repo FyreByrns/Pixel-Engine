@@ -356,8 +356,8 @@ namespace PixelEngine {
             if (KeysWithCorrespondingCharacters.Contains((int)key)) {
                 // find offset from Key value to CharKeyMapping index
                 int index = 0;
-                foreach((Key start, Key end, int off) in KeyCharOffsets) {
-                    if(start <= key && end >= key) {
+                foreach ((Key start, Key end, int off) in KeyCharOffsets) {
+                    if (start <= key && end >= key) {
                         // within the range, apply the offset
                         index = (int)key - (int)start + off;
                     }
@@ -383,12 +383,13 @@ namespace PixelEngine {
             // space
             52,
             // oem
-            67,68,69,70,71,72,73,/**/75,76,77,78,
+            67,68,69,70,71,72,73,/**/75,76,77,78,79,
         };
         public static (Key start, Key end, int offset)[] KeyCharOffsets = new (Key, Key, int)[] {
             (Key.A, Key.K9, 0),
             (Key.Space, Key.Space, 36),
-            (Key.OEM_1, Key.OEM_PERIOD, 37)
+            (Key.OEM_1, Key.OEM_7, 37),
+            (Key.OEM_PLUS, Key.OEM_PERIOD, 44)
         };
         public static string KeyCharMapping = "" +
             "aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwWxXyYzZ" +
