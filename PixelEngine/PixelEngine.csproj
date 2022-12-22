@@ -65,6 +65,7 @@
     <Compile Include="Utilities\Clock.cs" />
     <Compile Include="Timer.cs" />
     <Compile Include="Utilities\Vector.cs" />
+    <Compile Include="Vector2.cs" />
     <Compile Include="Windows.cs" />
   </ItemGroup>
   <ItemGroup>
