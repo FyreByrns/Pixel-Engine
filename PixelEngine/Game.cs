@@ -14,6 +14,8 @@ namespace PixelEngine {
         public static bool DUMB_PARALLEL_DRAW { get; protected set; } = false;
 
         #region Members
+        public int LastMouseX { get; private set; }
+        public int LastMouseY { get; private set; }
         public int MouseX { get; private set; }
         public int MouseY { get; private set; }
         public Pixel.Mode PixelMode { get; set; } = Pixel.Mode.Normal;
@@ -179,6 +181,8 @@ namespace PixelEngine {
 
                     HandleKeyboard();
                     HandleMouse();
+                    LastMouseX = MouseX;
+                    LastMouseY = MouseY;
 
                     FrameCount++;
 
@@ -200,6 +204,10 @@ namespace PixelEngine {
             DestroyTempPath();
         }
         private void HandleMouse() {
+            if(MouseX != LastMouseX || MouseY != LastMouseY) {
+                OnMouseMove(LastMouseX, LastMouseY, MouseX, MouseY);
+            }
+
             for (int i = 0; i < 3; i++) {
                 mouse[i].Pressed = false;
                 mouse[i].Released = false;
@@ -1259,6 +1267,7 @@ namespace PixelEngine {
         public virtual void OnMouseRelease(Mouse m) { }
         public virtual void OnMouseDown(Mouse m) { }
         public virtual void OnMouseScroll() { }
+        public virtual void OnMouseMove(int fromX, int fromY, int toX, int toY) { }
         public virtual void RawKeyPress(VK vk) { }
         public virtual void OnKeyPress(Key k) { }
         public virtual void RawKeyRelease(VK vk) { }

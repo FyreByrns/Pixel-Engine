@@ -7,6 +7,7 @@
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
 	  <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
 	  <PlatformTarget>x86</PlatformTarget>
+	  <Platforms>AnyCPU;x86</Platforms>
   </PropertyGroup>
   <ItemGroup>
 	<EmbeddedResource Include="Properties\*.dat" />
