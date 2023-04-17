@@ -3,8 +3,8 @@
         public static Vector2 Along(this Vector2 me, float dist, float r) =>
             Vector2.Along(me, dist, r);
 
-        public static PixelEngine.Point[] ToPointArr(this Vector2[] v) {
-            PixelEngine.Point[] result = new PixelEngine.Point[v.Length];
+        public static Point[] ToPointArr(this Vector2[] v) {
+            Point[] result = new Point[v.Length];
             for (int i = 0; i < v.Length; i++) {
                 result[i] = v[i];
             }
@@ -16,7 +16,7 @@
         public float x, y;
 
         public float Length2 => x * x + y * y;
-        public float Length => (float)System.Math.Sqrt(Length2);
+        public float Length => (float)Math.Sqrt(Length2);
 
         public Vector2 RawNormal =>
             new Vector2(y, -x);
@@ -51,7 +51,7 @@
         }
 
         public static Vector2 Along(Vector2 origin, float distance, float rotation) =>
-            new Vector2((float)(origin.x + System.Math.Sin(rotation) * distance), (float)(origin.y + System.Math.Cos(rotation) * distance));
+            new Vector2((float)(origin.x + Math.Sin(rotation) * distance), (float)(origin.y + Math.Cos(rotation) * distance));
 
         public static bool operator ==(Vector2 va, Vector2 vb) =>
                  va.x == vb.x &&
@@ -119,9 +119,16 @@
         public static float AngleBetween(Vector2 a, Vector2 b) {
             float dx = b.x - a.x;
             float dy = a.y - b.y;
-            return (float)System.Math.Atan2(dy, dx);
+            return (float)Math.Atan2(dy, dx) - (float)(Math.PI / 180d * 90d);
         }
 
         public static Vector2 Zero => new Vector2(0, 0);
+
+        public static Vector2 Round(Vector2 v) {
+            return ((float)Math.Round(v.x), (float)Math.Round(v.y));
+        }
+        public static Vector2 Floor(Vector2 v) {
+            return ((float)Math.Floor(v.x), (float)Math.Floor(v.y));
+        }
     }
 }
