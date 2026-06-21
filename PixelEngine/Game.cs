@@ -1,9 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Threading;
-
+using Hexa.NET.ImGui;
+using Hexa.NET.ImGui.Backends.OpenGL2;
+using Hexa.NET.ImGui.Backends.OpenGL3;
+using Hexa.NET.ImGui.Backends.Win32;
 using PixelEngine.Extensions;
 using PixelEngine.Utilities;
 
@@ -14,6 +18,9 @@ namespace PixelEngine {
         public static bool DUMB_PARALLEL_DRAW { get; protected set; } = false;
 
         #region Members
+        public ImGuiContextPtr ImGuiContext { get; protected set; }
+        public ImGuiIOPtr ImGuiIO { get; protected set; }
+
         public int LastMouseX { get; private set; }
         public int LastMouseY { get; private set; }
         public int MouseX { get; private set; }
@@ -113,6 +120,30 @@ namespace PixelEngine {
             RegisterClass();
             CreateWindow();
 
+            ImGuiContext = ImGui.CreateContext();
+            ImGui.SetCurrentContext(ImGuiContext);
+
+            ImGuiIO = ImGui.GetIO();
+            ImGuiIO.ConfigFlags |= ImGuiConfigFlags.NavEnableKeyboard;
+            ImGuiIO.ConfigFlags |= ImGuiConfigFlags.DockingEnable;
+
+            ImGui.StyleColorsDark();
+            var style = ImGui.GetStyle();
+            style.ScaleAllSizes(1);
+            style.FontScaleDpi = 1;
+
+            ImGuiImplWin32.SetCurrentContext(ImGuiContext);
+            unsafe {
+                if (!ImGuiImplWin32.InitForOpenGL((void*)Handle)) {
+                    Console.WriteLine("Failed to intialize ImGui Win32 for OpenGL");
+                }
+            }
+
+            ImGuiImplOpenGL3.SetCurrentContext(ImGuiContext);
+            if (!ImGuiImplOpenGL3.Init("#version 150")) {
+                Console.WriteLine("Failed to initialize ImGui for OpenGL 3");
+            }
+
             active = true;
 
             gameLoop = new Thread(GameLoop);
@@ -177,6 +208,11 @@ namespace PixelEngine {
                     if (paused)
                         continue;
 
+                    ImGuiImplOpenGL3.NewFrame();
+                    ImGuiImplWin32.NewFrame();
+                    ImGui.NewFrame();
+                    ImGui.ShowDemoWindow();
+
                     OnUpdate(elapsed);
 
                     HandleKeyboard();
@@ -204,7 +240,7 @@ namespace PixelEngine {
             DestroyTempPath();
         }
         private void HandleMouse() {
-            if(MouseX != LastMouseX || MouseY != LastMouseY) {
+            if (MouseX != LastMouseX || MouseY != LastMouseY) {
                 OnMouseMove(LastMouseX, LastMouseY, MouseX, MouseY);
             }
 
@@ -574,32 +610,91 @@ namespace PixelEngine {
             RegisterClassEx(ref wc);
         }
         private void MapKeyboard() {
-            MapKey(0x41, Key.A); MapKey(0x42, Key.B); MapKey(0x43, Key.C); MapKey(0x44, Key.D); MapKey(0x45, Key.E);
-            MapKey(0x46, Key.F); MapKey(0x47, Key.G); MapKey(0x48, Key.H); MapKey(0x49, Key.I); MapKey(0x4A, Key.J);
-            MapKey(0x4B, Key.K); MapKey(0x4C, Key.L); MapKey(0x4D, Key.M); MapKey(0x4E, Key.N); MapKey(0x4F, Key.O);
-            MapKey(0x50, Key.P); MapKey(0x51, Key.Q); MapKey(0x52, Key.R); MapKey(0x53, Key.S); MapKey(0x54, Key.T);
-            MapKey(0x55, Key.U); MapKey(0x56, Key.V); MapKey(0x57, Key.W); MapKey(0x58, Key.X); MapKey(0x59, Key.Y);
+            MapKey(0x41, Key.A);
+            MapKey(0x42, Key.B);
+            MapKey(0x43, Key.C);
+            MapKey(0x44, Key.D);
+            MapKey(0x45, Key.E);
+            MapKey(0x46, Key.F);
+            MapKey(0x47, Key.G);
+            MapKey(0x48, Key.H);
+            MapKey(0x49, Key.I);
+            MapKey(0x4A, Key.J);
+            MapKey(0x4B, Key.K);
+            MapKey(0x4C, Key.L);
+            MapKey(0x4D, Key.M);
+            MapKey(0x4E, Key.N);
+            MapKey(0x4F, Key.O);
+            MapKey(0x50, Key.P);
+            MapKey(0x51, Key.Q);
+            MapKey(0x52, Key.R);
+            MapKey(0x53, Key.S);
+            MapKey(0x54, Key.T);
+            MapKey(0x55, Key.U);
+            MapKey(0x56, Key.V);
+            MapKey(0x57, Key.W);
+            MapKey(0x58, Key.X);
+            MapKey(0x59, Key.Y);
             MapKey(0x5A, Key.Z);
 
-            MapKey(VK.F1, Key.F1); MapKey(VK.F2, Key.F2); MapKey(VK.F3, Key.F3); MapKey(VK.F4, Key.F4);
-            MapKey(VK.F5, Key.F5); MapKey(VK.F6, Key.F6); MapKey(VK.F7, Key.F7); MapKey(VK.F8, Key.F8);
-            MapKey(VK.F9, Key.F9); MapKey(VK.F10, Key.F10); MapKey(VK.F11, Key.F11); MapKey(VK.F12, Key.F12);
+            MapKey(VK.F1, Key.F1);
+            MapKey(VK.F2, Key.F2);
+            MapKey(VK.F3, Key.F3);
+            MapKey(VK.F4, Key.F4);
+            MapKey(VK.F5, Key.F5);
+            MapKey(VK.F6, Key.F6);
+            MapKey(VK.F7, Key.F7);
+            MapKey(VK.F8, Key.F8);
+            MapKey(VK.F9, Key.F9);
+            MapKey(VK.F10, Key.F10);
+            MapKey(VK.F11, Key.F11);
+            MapKey(VK.F12, Key.F12);
 
-            MapKey(VK.DOWN, Key.Down); MapKey(VK.LEFT, Key.Left); MapKey(VK.RIGHT, Key.Right); MapKey(VK.UP, Key.Up);
+            MapKey(VK.DOWN, Key.Down);
+            MapKey(VK.LEFT, Key.Left);
+            MapKey(VK.RIGHT, Key.Right);
+            MapKey(VK.UP, Key.Up);
 
-            MapKey(VK.BACK, Key.Back); MapKey(VK.ESCAPE, Key.Escape); MapKey(VK.RETURN, Key.Enter); MapKey(VK.PAUSE, Key.Pause);
-            MapKey(VK.SCROLL, Key.Scroll); MapKey(VK.TAB, Key.Tab); MapKey(VK.DELETE, Key.Delete); MapKey(VK.HOME, Key.Home);
-            MapKey(VK.END, Key.End); MapKey(VK.PRIOR, Key.PageUp); MapKey(VK.NEXT, Key.PageDown); MapKey(VK.INSERT, Key.Insert);
-            MapKey(VK.SHIFT, Key.Shift); MapKey(VK.CONTROL, Key.Control); MapKey(VK.MENU, Key.Alt);
+            MapKey(VK.BACK, Key.Back);
+            MapKey(VK.ESCAPE, Key.Escape);
+            MapKey(VK.RETURN, Key.Enter);
+            MapKey(VK.PAUSE, Key.Pause);
+            MapKey(VK.SCROLL, Key.Scroll);
+            MapKey(VK.TAB, Key.Tab);
+            MapKey(VK.DELETE, Key.Delete);
+            MapKey(VK.HOME, Key.Home);
+            MapKey(VK.END, Key.End);
+            MapKey(VK.PRIOR, Key.PageUp);
+            MapKey(VK.NEXT, Key.PageDown);
+            MapKey(VK.INSERT, Key.Insert);
+            MapKey(VK.SHIFT, Key.Shift);
+            MapKey(VK.CONTROL, Key.Control);
+            MapKey(VK.MENU, Key.Alt);
             MapKey(VK.SPACE, Key.Space);
 
-            MapKey(0x30, Key.K0); MapKey(0x31, Key.K1); MapKey(0x32, Key.K2); MapKey(0x33, Key.K3); MapKey(0x34, Key.K4);
-            MapKey(0x35, Key.K5); MapKey(0x36, Key.K6); MapKey(0x37, Key.K7); MapKey(0x38, Key.K8); MapKey(0x39, Key.K9);
+            MapKey(0x30, Key.K0);
+            MapKey(0x31, Key.K1);
+            MapKey(0x32, Key.K2);
+            MapKey(0x33, Key.K3);
+            MapKey(0x34, Key.K4);
+            MapKey(0x35, Key.K5);
+            MapKey(0x36, Key.K6);
+            MapKey(0x37, Key.K7);
+            MapKey(0x38, Key.K8);
+            MapKey(0x39, Key.K9);
 
-            MapKey(VK.OEM_1, Key.OEM_1); MapKey(VK.OEM_2, Key.OEM_2); MapKey(VK.OEM_3, Key.OEM_3); MapKey(VK.OEM_4, Key.OEM_4);
-            MapKey(VK.OEM_5, Key.OEM_5); MapKey(VK.OEM_6, Key.OEM_6); MapKey(VK.OEM_7, Key.OEM_7); MapKey(VK.OEM_8, Key.OEM_8);
-            MapKey(VK.OEM_PLUS, Key.OEM_PLUS); MapKey(VK.OEM_MINUS, Key.OEM_MINUS);
-            MapKey(VK.OEM_COMMA, Key.OEM_COMMA); MapKey(VK.OEM_PERIOD, Key.OEM_PERIOD);
+            MapKey(VK.OEM_1, Key.OEM_1);
+            MapKey(VK.OEM_2, Key.OEM_2);
+            MapKey(VK.OEM_3, Key.OEM_3);
+            MapKey(VK.OEM_4, Key.OEM_4);
+            MapKey(VK.OEM_5, Key.OEM_5);
+            MapKey(VK.OEM_6, Key.OEM_6);
+            MapKey(VK.OEM_7, Key.OEM_7);
+            MapKey(VK.OEM_8, Key.OEM_8);
+            MapKey(VK.OEM_PLUS, Key.OEM_PLUS);
+            MapKey(VK.OEM_MINUS, Key.OEM_MINUS);
+            MapKey(VK.OEM_COMMA, Key.OEM_COMMA);
+            MapKey(VK.OEM_PERIOD, Key.OEM_PERIOD);
         }
         #endregion
 
@@ -639,15 +734,22 @@ namespace PixelEngine {
         }
         public void DrawLine(Point p1, Point p2, Pixel col) {
             int x, y, dx, dy, dx1, dy1, px, py, xe, ye, i;
-            dx = p2.X - p1.X; dy = p2.Y - p1.Y;
-            dx1 = Math.Abs(dx); dy1 = Math.Abs(dy);
-            px = 2 * dy1 - dx1; py = 2 * dx1 - dy1;
+            dx = p2.X - p1.X;
+            dy = p2.Y - p1.Y;
+            dx1 = Math.Abs(dx);
+            dy1 = Math.Abs(dy);
+            px = 2 * dy1 - dx1;
+            py = 2 * dx1 - dy1;
             if (dy1 <= dx1) {
                 if (dx >= 0) {
-                    x = p1.X; y = p1.Y; xe = p2.X;
+                    x = p1.X;
+                    y = p1.Y;
+                    xe = p2.X;
                 }
                 else {
-                    x = p2.X; y = p2.Y; xe = p1.X;
+                    x = p2.X;
+                    y = p2.Y;
+                    xe = p1.X;
                 }
 
                 Draw(x, y, col);
@@ -657,7 +759,10 @@ namespace PixelEngine {
                     if (px < 0)
                         px = px + 2 * dy1;
                     else {
-                        if ((dx < 0 && dy < 0) || (dx > 0 && dy > 0)) y = y + 1; else y = y - 1;
+                        if ((dx < 0 && dy < 0) || (dx > 0 && dy > 0))
+                            y = y + 1;
+                        else
+                            y = y - 1;
                         px = px + 2 * (dy1 - dx1);
                     }
                     Draw(x, y, col);
@@ -665,10 +770,14 @@ namespace PixelEngine {
             }
             else {
                 if (dy >= 0) {
-                    x = p1.X; y = p1.Y; ye = p2.Y;
+                    x = p1.X;
+                    y = p1.Y;
+                    ye = p2.Y;
                 }
                 else {
-                    x = p2.X; y = p2.Y; ye = p1.Y;
+                    x = p2.X;
+                    y = p2.Y;
+                    ye = p1.Y;
                 }
 
                 Draw(x, y, col);
@@ -678,7 +787,10 @@ namespace PixelEngine {
                     if (py <= 0)
                         py = py + 2 * dx1;
                     else {
-                        if ((dx < 0 && dy < 0) || (dx > 0 && dy > 0)) x = x + 1; else x = x - 1;
+                        if ((dx < 0 && dy < 0) || (dx > 0 && dy > 0))
+                            x = x + 1;
+                        else
+                            x = x - 1;
                         py = py + 2 * (dx1 - dy1);
                     }
                     Draw(x, y, col);
@@ -870,13 +982,18 @@ namespace PixelEngine {
             if (y1 > y3) { Swap(ref y1, ref y3); Swap(ref x1, ref x3); }
             if (y2 > y3) { Swap(ref y2, ref y3); Swap(ref x2, ref x3); }
 
-            t1x = t2x = x1; y = y1;   // Starting points
-            dx1 = x2 - x1; if (dx1 < 0) { dx1 = -dx1; signx1 = -1; }
-            else signx1 = 1;
+            t1x = t2x = x1;
+            y = y1;   // Starting points
+            dx1 = x2 - x1;
+            if (dx1 < 0) { dx1 = -dx1; signx1 = -1; }
+            else
+                signx1 = 1;
             dy1 = y2 - y1;
 
-            dx2 = x3 - x1; if (dx2 < 0) { dx2 = -dx2; signx2 = -1; }
-            else signx2 = 1;
+            dx2 = x3 - x1;
+            if (dx2 < 0) { dx2 = -dx2; signx2 = -1; }
+            else
+                signx2 = 1;
             dy2 = y3 - y1;
 
             if (dy1 > dx1) {   // swap values
@@ -890,11 +1007,13 @@ namespace PixelEngine {
 
             e2 = dx2 >> 1;
             // Flat top, just process the second half
-            if (y1 == y2) goto next;
+            if (y1 == y2)
+                goto next;
             e1 = dx1 >> 1;
 
             for (int i = 0; i < dx1;) {
-                t1xp = 0; t2xp = 0;
+                t1xp = 0;
+                t2xp = 0;
                 if (t1x < t2x) { minx = t1x; maxx = t2x; }
                 else { minx = t2x; maxx = t1x; }
                 // process first line until y value is about to change
@@ -903,11 +1022,15 @@ namespace PixelEngine {
                     e1 += dy1;
                     while (e1 >= dx1) {
                         e1 -= dx1;
-                        if (changed1) t1xp = signx1;//t1x += signx1;
-                        else goto next1;
+                        if (changed1)
+                            t1xp = signx1;//t1x += signx1;
+                        else
+                            goto next1;
                     }
-                    if (changed1) break;
-                    else t1x += signx1;
+                    if (changed1)
+                        break;
+                    else
+                        t1x += signx1;
                 }
             // Move line
             next1:
@@ -916,29 +1039,44 @@ namespace PixelEngine {
                     e2 += dy2;
                     while (e2 >= dx2) {
                         e2 -= dx2;
-                        if (changed2) t2xp = signx2;//t2x += signx2;
-                        else goto next2;
+                        if (changed2)
+                            t2xp = signx2;//t2x += signx2;
+                        else
+                            goto next2;
                     }
-                    if (changed2) break;
-                    else t2x += signx2;
+                    if (changed2)
+                        break;
+                    else
+                        t2x += signx2;
                 }
             next2:
-                if (minx > t1x) minx = t1x; if (minx > t2x) minx = t2x;
-                if (maxx < t1x) maxx = t1x; if (maxx < t2x) maxx = t2x;
+                if (minx > t1x)
+                    minx = t1x;
+                if (minx > t2x)
+                    minx = t2x;
+                if (maxx < t1x)
+                    maxx = t1x;
+                if (maxx < t2x)
+                    maxx = t2x;
                 MakeLine(minx, maxx, y);    // Draw line from min to max points found on the y
                                             // Now increase y
-                if (!changed1) t1x += signx1;
+                if (!changed1)
+                    t1x += signx1;
                 t1x += t1xp;
-                if (!changed2) t2x += signx2;
+                if (!changed2)
+                    t2x += signx2;
                 t2x += t2xp;
                 y += 1;
-                if (y == y2) break;
+                if (y == y2)
+                    break;
 
             }
         next:
             // Second half
-            dx1 = x3 - x2; if (dx1 < 0) { dx1 = -dx1; signx1 = -1; }
-            else signx1 = 1;
+            dx1 = x3 - x2;
+            if (dx1 < 0) { dx1 = -dx1; signx1 = -1; }
+            else
+                signx1 = 1;
             dy1 = y3 - y2;
             t1x = x2;
 
@@ -946,12 +1084,14 @@ namespace PixelEngine {
                 Swap(ref dy1, ref dx1);
                 changed1 = true;
             }
-            else changed1 = false;
+            else
+                changed1 = false;
 
             e1 = dx1 >> 1;
 
             for (int i = 0; i <= dx1; i++) {
-                t1xp = 0; t2xp = 0;
+                t1xp = 0;
+                t2xp = 0;
                 if (t1x < t2x) { minx = t1x; maxx = t2x; }
                 else { minx = t2x; maxx = t1x; }
                 // process first line until y value is about to change
@@ -960,11 +1100,15 @@ namespace PixelEngine {
                     while (e1 >= dx1) {
                         e1 -= dx1;
                         if (changed1) { t1xp = signx1; break; }//t1x += signx1;
-                        else goto next3;
+                        else
+                            goto next3;
                     }
-                    if (changed1) break;
-                    else t1x += signx1;
-                    if (i < dx1) i++;
+                    if (changed1)
+                        break;
+                    else
+                        t1x += signx1;
+                    if (i < dx1)
+                        i++;
                 }
             next3:
                 // process second line until y value is about to change
@@ -972,23 +1116,36 @@ namespace PixelEngine {
                     e2 += dy2;
                     while (e2 >= dx2) {
                         e2 -= dx2;
-                        if (changed2) t2xp = signx2;
-                        else goto next4;
+                        if (changed2)
+                            t2xp = signx2;
+                        else
+                            goto next4;
                     }
-                    if (changed2) break;
-                    else t2x += signx2;
+                    if (changed2)
+                        break;
+                    else
+                        t2x += signx2;
                 }
             next4:
 
-                if (minx > t1x) minx = t1x; if (minx > t2x) minx = t2x;
-                if (maxx < t1x) maxx = t1x; if (maxx < t2x) maxx = t2x;
+                if (minx > t1x)
+                    minx = t1x;
+                if (minx > t2x)
+                    minx = t2x;
+                if (maxx < t1x)
+                    maxx = t1x;
+                if (maxx < t2x)
+                    maxx = t2x;
                 MakeLine(minx, maxx, y);
-                if (!changed1) t1x += signx1;
+                if (!changed1)
+                    t1x += signx1;
                 t1x += t1xp;
-                if (!changed2) t2x += signx2;
+                if (!changed2)
+                    t2x += signx2;
                 t2x += t2xp;
                 y += 1;
-                if (y > y3) return;
+                if (y > y3)
+                    return;
             }
         }
         public void DrawPolygon(Point[] verts, Pixel col) {

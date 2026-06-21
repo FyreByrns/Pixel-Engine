@@ -1,102 +1,98 @@
-﻿using System;
+﻿using Hexa.NET.ImGui;
+using Hexa.NET.ImGui.Backends.OpenGL3;
+using System;
 using System.Runtime.InteropServices;
 
 using static PixelEngine.Windows;
 
-namespace PixelEngine
-{
-	internal class OpenGL
-	{
-		private Game game;
+namespace PixelEngine {
+    internal class OpenGL {
+        private Game game;
 
-		private IntPtr deviceContext;
-		private IntPtr renderContext;
+        private IntPtr deviceContext;
+        private IntPtr renderContext;
 
-		private float pw, ph;
-		private float ww, wh;
+        private float pw, ph;
+        private float ww, wh;
 
-		public void Create(Game game)
-		{
-			this.game = game;
+        public void Create(Game game) {
+            this.game = game;
 
-			deviceContext = GetDC(game.Handle);
+            deviceContext = GetDC(game.Handle);
 
-			PixelFormatDesc pfd = new PixelFormatDesc(1,
-				(uint)PFD.DrawToWindow | (uint)PFD.SupportOpenGL | (uint)PFD.DoubleBuffer,
-				(byte)PFD.TypeRGBA, 32, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-				(sbyte)PFD.MainPlane, 0, 0, 0, 0);
+            PixelFormatDesc pfd = new PixelFormatDesc(1,
+                (uint)PFD.DrawToWindow | (uint)PFD.SupportOpenGL | (uint)PFD.DoubleBuffer,
+                (byte)PFD.TypeRGBA, 32, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                (sbyte)PFD.MainPlane, 0, 0, 0, 0);
 
-			int pf = ChoosePixelFormat(deviceContext, ref pfd);
+            int pf = ChoosePixelFormat(deviceContext, ref pfd);
 
-			if (pf == 0)
-				return;
+            if (pf == 0)
+                return;
 
-			SetPixelFormat(deviceContext, pf, ref pfd);
+            SetPixelFormat(deviceContext, pf, ref pfd);
 
-			renderContext = WglCreateContext(deviceContext);
-			if (renderContext == IntPtr.Zero)
-				return;
+            renderContext = WglCreateContext(deviceContext);
+            if (renderContext == IntPtr.Zero)
+                return;
 
-			WglMakeCurrent(deviceContext, renderContext);
+            WglMakeCurrent(deviceContext, renderContext);
 
-			uint glBuffer = 0;
+            uint glBuffer = 0;
 
-			GlEnable((uint)GL.Texture2D);
-			GlGenTextures(1, new uint[] { glBuffer });
-			GlBindTexture((uint)GL.Texture2D, glBuffer);
-			GlTexParameteri((uint)GL.Texture2D, (uint)GL.TextureMagFilter, (int)GL.Nearest);
-			GlTexParameteri((uint)GL.Texture2D, (uint)GL.TextureMinFilter, (int)GL.Nearest);
-			GlTexEnvf((uint)GL.TextureEnv, (uint)GL.TextureEnvMode, (float)GL.Decal);
-		}
+            GlEnable((uint)GL.Texture2D);
+            GlGenTextures(1, new uint[] { glBuffer });
+            GlBindTexture((uint)GL.Texture2D, glBuffer);
+            GlTexParameteri((uint)GL.Texture2D, (uint)GL.TextureMagFilter, (int)GL.Nearest);
+            GlTexParameteri((uint)GL.Texture2D, (uint)GL.TextureMinFilter, (int)GL.Nearest);
+            GlTexEnvf((uint)GL.TextureEnv, (uint)GL.TextureEnvMode, (float)GL.Decal);
+        }
 
-		public unsafe void Initialize(Sprite drawTarget, Sprite textTarget)
-		{
-			GlTexImage2D((uint)GL.Texture2D, 0, (uint)GL.RGBA,
-				game.ScreenWidth, game.ScreenHeight,
-				0, (uint)GL.RGBA, (uint)GL.UnsignedByte, null);
+        public unsafe void Initialize(Sprite drawTarget, Sprite textTarget) {
+            GlTexImage2D((uint)GL.Texture2D, 0, (uint)GL.RGBA,
+                game.ScreenWidth, game.ScreenHeight,
+                0, (uint)GL.RGBA, (uint)GL.UnsignedByte, null);
 
-			ww = 1f / game.windowWidth;
-			wh = 1f / game.windowHeight;
+            ww = 1f / game.windowWidth;
+            wh = 1f / game.windowHeight;
 
-			pw = game.PixWidth * ww;
-			ph = game.PixHeight * wh;
+            pw = game.PixWidth * ww;
+            ph = game.PixHeight * wh;
 
-			SetValues(pw, ph, ww, wh);
-			CreateCoords(game.PixWidth, game.PixHeight, game.ScreenWidth, game.ScreenHeight);
+            SetValues(pw, ph, ww, wh);
+            CreateCoords(game.PixWidth, game.PixHeight, game.ScreenWidth, game.ScreenHeight);
 
-			IntPtr vsyncPtr = WglGetProcAddress("wglSwapIntervalEXT");
-			if (vsyncPtr != IntPtr.Zero)
-			{
-				SwapInterval swap = Marshal.GetDelegateForFunctionPointer<SwapInterval>(vsyncPtr);
-				swap(0);
-			}
+            IntPtr vsyncPtr = WglGetProcAddress("wglSwapIntervalEXT");
+            if (vsyncPtr != IntPtr.Zero) {
+                SwapInterval swap = Marshal.GetDelegateForFunctionPointer<SwapInterval>(vsyncPtr);
+                swap(0);
+            }
 
-			ReleaseDC(game.Handle, deviceContext);
-			deviceContext = GetDC(game.Handle);
-		}
+            ReleaseDC(game.Handle, deviceContext);
+            deviceContext = GetDC(game.Handle);
+        }
 
-		public unsafe void Draw(Sprite drawTarget, Sprite textTarget)
-		{
-			fixed (Pixel* ptr = drawTarget.GetData())
-			{
-				if (game.PixWidth == 1 && game.PixHeight == 1)
-					RenderUnitPixels(drawTarget.Width, drawTarget.Height, ptr);
-				else
-					RenderPixels(drawTarget.Width, drawTarget.Height, ptr);
-			}
+        public unsafe void Draw(Sprite drawTarget, Sprite textTarget) {
+            fixed (Pixel* ptr = drawTarget.GetData()) {
+                if (game.PixWidth == 1 && game.PixHeight == 1)
+                    RenderUnitPixels(drawTarget.Width, drawTarget.Height, ptr);
+                else
+                    RenderPixels(drawTarget.Width, drawTarget.Height, ptr);
+            }
 
-			if (textTarget != null)
-				fixed (Pixel* ptr = textTarget.GetData())
-					RenderText(game.windowWidth, game.windowHeight, textTarget.Width, textTarget.Height, ptr);
+            if (textTarget != null)
+                fixed (Pixel* ptr = textTarget.GetData())
+                    RenderText(game.windowWidth, game.windowHeight, textTarget.Width, textTarget.Height, ptr);
 
-			SwapBuffers(deviceContext);
-		}
+            ImGui.Render();
+            ImGuiImplOpenGL3.RenderDrawData(ImGui.GetDrawData());
+            SwapBuffers(deviceContext);
+        }
 
-		public void Destroy()
-		{
-			ReleaseDC(game.Handle, deviceContext);
-			WglDeleteContext(renderContext);
-			DestroyCoords();
-		}
-	}
+        public void Destroy() {
+            ReleaseDC(game.Handle, deviceContext);
+            WglDeleteContext(renderContext);
+            DestroyCoords();
+        }
+    }
 }
