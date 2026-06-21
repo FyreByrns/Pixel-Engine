@@ -178,6 +178,10 @@ namespace PixelEngine
 			return Empty;
 		}
 
+		public static implicit operator uint(Pixel p) {
+			return (uint)(p.A << 24 + p.R << 16 + p.G << 8 + p.B);
+		}
+
 		public override bool Equals(object obj)
 		{
 			if (obj is Pixel p)
