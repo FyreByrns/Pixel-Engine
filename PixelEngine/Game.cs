@@ -311,9 +311,6 @@ namespace PixelEngine {
         }
         private protected override IntPtr WndProc(IntPtr handle, uint msg, int wParam, int lParam) {
             ImGuiImplWin32.WndProcHandler(handle, msg, (nuint)wParam, lParam);
-            if (!ImGuiIO.IsNull) {
-                if (ImGuiIO.WantCaptureMouse) { return DefWindowProc(handle, msg, wParam, lParam); }
-            }
 
             switch (msg) {
                 case (uint)WM.SETFOCUS:
@@ -323,6 +320,7 @@ namespace PixelEngine {
                     Focus = false;
                     break;
                 case (uint)WM.KEYDOWN:
+                    if (!ImGuiIO.IsNull && ImGuiIO.WantTextInput) break;
                     RawKeyPress((VK)wParam);
                     if (!mapKeys.ContainsKey((uint)wParam))
                         break;
@@ -331,6 +329,7 @@ namespace PixelEngine {
                     OnKeyPress(kd);
                     break;
                 case (uint)WM.KEYUP:
+                    if (!ImGuiIO.IsNull && ImGuiIO.WantTextInput) break;
                     RawKeyRelease((VK)wParam);
                     if (!mapKeys.ContainsKey((uint)wParam))
                         break;
@@ -339,31 +338,38 @@ namespace PixelEngine {
                     OnKeyRelease(ku);
                     break;
                 case (uint)WM.MOUSEWHEEL:
+                    if (!ImGuiIO.IsNull && ImGuiIO.WantCaptureMouse) break;
                     short wheel = (short)(wParam >> 16);
                     MouseScroll = (Scroll)(wheel / WheelDelta);
                     OnMouseScroll();
                     break;
                 case (uint)WM.LBUTTONDOWN:
+                    if (!ImGuiIO.IsNull && ImGuiIO.WantCaptureMouse) break;
                     newMouse[(int)Mouse.Left] = true;
                     OnMousePress(Mouse.Left);
                     break;
                 case (uint)WM.LBUTTONUP:
+                    if (!ImGuiIO.IsNull && ImGuiIO.WantCaptureMouse) break;
                     newMouse[(int)Mouse.Left] = false;
                     OnMouseRelease(Mouse.Left);
                     break;
                 case (uint)WM.RBUTTONDOWN:
+                    if (!ImGuiIO.IsNull && ImGuiIO.WantCaptureMouse) break;
                     newMouse[(int)Mouse.Right] = true;
                     OnMousePress(Mouse.Right);
                     break;
                 case (uint)WM.RBUTTONUP:
+                    if (!ImGuiIO.IsNull && ImGuiIO.WantCaptureMouse) break;
                     newMouse[(int)Mouse.Right] = false;
                     OnMouseRelease(Mouse.Right);
                     break;
                 case (uint)WM.MBUTTONDOWN:
+                    if (!ImGuiIO.IsNull && ImGuiIO.WantCaptureMouse) break;
                     newMouse[(int)Mouse.Middle] = true;
                     OnMousePress(Mouse.Middle);
                     break;
                 case (uint)WM.MBUTTONUP:
+                    if (!ImGuiIO.IsNull && ImGuiIO.WantCaptureMouse) break;
                     newMouse[(int)Mouse.Middle] = false;
                     OnMouseRelease(Mouse.Middle);
                     break;
