@@ -120,30 +120,6 @@ namespace PixelEngine {
             RegisterClass();
             CreateWindow();
 
-            ImGuiContext = ImGui.CreateContext();
-            ImGui.SetCurrentContext(ImGuiContext);
-
-            ImGuiIO = ImGui.GetIO();
-            ImGuiIO.ConfigFlags |= ImGuiConfigFlags.NavEnableKeyboard;
-            ImGuiIO.ConfigFlags |= ImGuiConfigFlags.DockingEnable;
-
-            ImGui.StyleColorsDark();
-            var style = ImGui.GetStyle();
-            style.ScaleAllSizes(1);
-            style.FontScaleDpi = 1;
-
-            ImGuiImplWin32.SetCurrentContext(ImGuiContext);
-            unsafe {
-                if (!ImGuiImplWin32.InitForOpenGL((void*)Handle)) {
-                    Console.WriteLine("Failed to intialize ImGui Win32 for OpenGL");
-                }
-            }
-
-            ImGuiImplOpenGL3.SetCurrentContext(ImGuiContext);
-            if (!ImGuiImplOpenGL3.Init("#version 150")) {
-                Console.WriteLine("Failed to initialize ImGui for OpenGL 3");
-            }
-
             active = true;
 
             gameLoop = new Thread(GameLoop);
@@ -172,6 +148,31 @@ namespace PixelEngine {
             canvas = new OpenGL();
             canvas.Create(this);
             canvas.Initialize(defDrawTarget, textTarget);
+
+            ImGuiContext = ImGui.CreateContext();
+            ImGui.SetCurrentContext(ImGuiContext);
+
+            ImGuiIO = ImGui.GetIO();
+            ImGuiIO.ConfigFlags |= ImGuiConfigFlags.NavEnableKeyboard;
+            ImGuiIO.ConfigFlags |= ImGuiConfigFlags.DockingEnable;
+            Console.WriteLine(ImGuiIO);
+
+            ImGui.StyleColorsDark();
+            var style = ImGui.GetStyle();
+            style.ScaleAllSizes(1);
+            style.FontScaleDpi = 1;
+
+            ImGuiImplWin32.SetCurrentContext(ImGuiContext);
+            unsafe {
+                if (!ImGuiImplWin32.InitForOpenGL((void*)Handle)) {
+                    Console.WriteLine("Failed to intialize ImGui Win32 for OpenGL");
+                }
+            }
+
+            ImGuiImplOpenGL3.SetCurrentContext(ImGuiContext);
+            if (!ImGuiImplOpenGL3.Init("#version 150")) {
+                Console.WriteLine("Failed to initialize ImGui for OpenGL 3");
+            }
 
             DateTime t1, t2;
             t1 = t2 = DateTime.Now;
@@ -211,7 +212,6 @@ namespace PixelEngine {
                     ImGuiImplOpenGL3.NewFrame();
                     ImGuiImplWin32.NewFrame();
                     ImGui.NewFrame();
-                    ImGui.ShowDemoWindow();
 
                     OnUpdate(elapsed);
 
@@ -310,6 +310,11 @@ namespace PixelEngine {
             DrawTarget = defDrawTarget;
         }
         private protected override IntPtr WndProc(IntPtr handle, uint msg, int wParam, int lParam) {
+            ImGuiImplWin32.WndProcHandler(handle, msg, (nuint)wParam, lParam);
+            if (!ImGuiIO.IsNull) {
+                if (ImGuiIO.WantCaptureMouse) { return DefWindowProc(handle, msg, wParam, lParam); }
+            }
+
             switch (msg) {
                 case (uint)WM.SETFOCUS:
                     Focus = true;
