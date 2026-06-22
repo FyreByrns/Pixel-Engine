@@ -2,6 +2,7 @@
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
+using static PixelEngine.Windows;
 
 namespace PixelEngine
 {
@@ -209,5 +210,37 @@ namespace PixelEngine
 		
 		internal ref Pixel[] GetData() => ref colorData;
 		private Pixel[] colorData = null;
-	}
+
+		public uint GPUTextureHandle = 0;
+		public void MakeGPUTexture() {
+			if (GPUTextureHandle != 0) {
+				return;
+			}
+
+			GlEnable((uint)GL.Texture2D);
+			uint[] gen = new uint[1];
+			GlGenTextures(1, gen);
+			GPUTextureHandle = gen[0];
+
+			GlBindTexture((uint)GL.Texture2D, GPUTextureHandle);
+			GlTexParameteri((uint)GL.Texture2D, (uint)GL.TextureMagFilter, (int)GL.Nearest);
+			GlTexParameteri((uint)GL.Texture2D, (uint)GL.TextureMinFilter, (int)GL.Nearest);
+			GlTexEnvf((uint)GL.TextureEnv, (uint)GL.TextureEnvMode, (float)GL.Decal);
+
+			UpdateGPUTexture();
+		}
+		public void DeleteGPUTexture() {
+			if (GPUTextureHandle != 0)
+				GlDeleteTextures(1, [GPUTextureHandle]);
+			GPUTextureHandle = 0;
+		}
+		public void UpdateGPUTexture() {
+            GlBindTexture((uint)GL.Texture2D, GPUTextureHandle);
+            unsafe {
+                fixed (Pixel* p = GetData())
+                    GlTexImage2D((uint)GL.Texture2D, 0, (uint)GL.RGBA, Width, Height, 0, (uint)GL.RGBA, (uint)GL.UnsignedByte, p);
+            }
+			GlBindTexture((uint)GL.Texture2D, 0);
+        }
+    }
 }

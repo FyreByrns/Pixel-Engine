@@ -739,7 +739,10 @@ namespace PixelEngine
 		[DllImport(OpenGl, SetLastError = true, EntryPoint = "glGenTextures")]
 		public static extern void GlGenTextures(int n, [MarshalAs(UnmanagedType.LPArray)] uint[] textures);
 
-		[DllImport(OpenGl, SetLastError = true, EntryPoint = "glBindTexture")]
+        [DllImport(OpenGl, SetLastError = true, EntryPoint = "glDeleteTextures")]
+        public static extern void GlDeleteTextures(int n, [MarshalAs(UnmanagedType.LPArray)] uint[] textures);
+
+        [DllImport(OpenGl, SetLastError = true, EntryPoint = "glBindTexture")]
 		public static extern void GlBindTexture(uint target, uint texture);
 
 		[DllImport(OpenGl, SetLastError = true, EntryPoint = "glTexParameteri")]
